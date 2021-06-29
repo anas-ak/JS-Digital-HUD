@@ -48,3 +48,171 @@ loop.start();
 
 // Word Shuffler
 
+class LetterShuffler {
+    constructor(wrapper, letter, { duration = 30 } = {}) {
+        this.SHUFFLING_VALUES = [
+            '!', '§', '$', '%',
+            '&', '/', '(', ')',
+            '=', '?', '_', '<',
+            '>', '^', '°', '*',
+            '#', '-', ':', ';', '~',
+        ];
+
+        this.id = Math.random();
+        this.animate = false;
+
+    this.wrapper = wrapper;
+    this.letter = letter;
+    this.letterToShown = this.letter;
+    this.wrapper.innerHTML = '';
+    this.timer = 0;
+    this.duration = 30;
+    this.scaleTargeted = 2;
+
+    this.show = this.show.bind(this);
+    this.update = this.update.bind(this);
+
+
+    // Regex Thank to @milesmanners !
+    // https://codepen.io/milesmanners/
+    if (/[+\-| ]/.test(letter)) {
+      this.wrapper.classList.add('purple')
+    } else {
+      this.duration *= 2.1;
+    }
+  }
+
+  show(letter = this.letter) {
+    this.animate = true;
+    this.timer = 0;
+    this.letterToShown = letter;
+    loop.add(this.update)
+  }
+
+  hide() {
+    this.show('')
+  }
+
+  update() {
+    if (this.animate) {
+      this.timer++;
+      if (this.timer < this.duration) {
+        this.wrapper.innerHTML = this.SHUFFLING_VALUES[Math.floor(Math.random() * this.SHUFFLING_VALUES.length)];
+        this.wrapper.style.transform = `scale(${(this.timer / this.duration) * 0.9})`
+      } else {
+        this.wrapper.innerHTML = this.letterToShown;
+        loop.remove(this.update)
+      }
+    }
+  }
+}
+
+/**
+ *
+ */
+class WordShuffler {
+  constructor(wrapper, words, { duration = 0.2 } = {}) {
+    this.wrapper = wrapper;
+    this.wrapper.innerHTML = '';
+
+    this.timer = 0;
+    this.lettersShown = 0;
+    this.letterDuration = duration * 60;
+    this.lettersShuffler = [];
+    this.arrayOfLetters = [...words];
+    this.duration = this.letterDuration * this.arrayOfLetters.length;
+
+    this.arrayOfLetters.forEach((letter) => {
+      const letterWrapper = document.createElement('span');
+      this.wrapper.appendChild(letterWrapper);
+      const letterShuffler = new LetterShuffler(letterWrapper, letter, {
+        duration: this.letterDuration,
+      });
+      this.lettersShuffler.push(letterShuffler);
+    });
+
+    this.update = this.update.bind(this);
+    this.timer = 0;
+  }
+
+  show() {
+    this.timer = 0;
+    this.lettersShown = 0;
+    loop.add(this.update);
+  }
+
+  update() {
+    this.timer += 1;
+    if (this.timer > (this.letterDuration * this.lettersShown)) {
+      this.lettersShuffler[this.lettersShown].show();
+      this.lettersShown += 1
+    }
+
+    if (this.timer >= this.duration) {
+      loop.remove(this.update)
+    }
+  }
+}
+
+const WORDS = [
+  '+  -                             -  +',
+  '                                     ',
+  '                                     ',
+  '                                     ',
+  '                                     ',
+  '|            Hello Neo...           |',
+  '                                     ',
+  '                                     ',
+  '                                     ',
+  '                                     ',
+  '                                     ',
+  '+  -                             -  +',
+];
+
+class TextShuffler {
+  constructor(wrapper, lines) {
+    this.i = 0;
+    this.lines = [];
+    this.durationInterval = 50;
+    this.wrapper = wrapper;
+    for (let i = 0; i < lines.length; i++) {
+      this.lines.push(this._addLine(lines[i]));
+    }
+  }
+
+  _addLine(line) {
+    const lineElm = document.createElement('p')
+    this.wrapper.appendChild(lineElm)
+    const word = new WordShuffler(lineElm, line, { duration: 0.05 })
+    return word;
+  }
+
+  show() {
+    this.i = 0;
+    const interval = setInterval(() => {
+      this.lines[this.i].show();
+      this.i += 1;
+
+      if (this.i === this.lines.length) {
+        clearInterval(interval)
+      }
+    }, this.durationInterval);
+  }
+
+  hide() {
+
+  }
+}
+
+
+// START
+const wrapper = document.getElementById('wrapper')
+const text = new TextShuffler(wrapper, WORDS)
+text.show();
+
+let show = true;
+setInterval(() => {
+  text.show();
+  show = !show;
+}, 4000);
+    

@@ -5,7 +5,7 @@ body, html {
     background-color: #141e30;
     margin: 0;
     font-family: monospace;
-    background: linear-gradient(45deg, #141823 0%, #292e49 100%);
+    background: linear-gradient(45deg, #081601 0%, #011804 100%);
     font-weight: lighter;
     color: #fff8f0;
 }
@@ -50,9 +50,9 @@ body, html {
 }
 
 #wrapper span.purple {
-    color: #a558e9;
+    color: #60dd0d;
 }
 
 #wrapper span.purple:hover:after {
-    background-color: #a558e9;
+    background-color: #60dd0d;
 }
